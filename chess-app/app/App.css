@@ -9,16 +9,28 @@
 }
 
 #chessboard .tile {
+  display: grid;
+  place-content: center;
   width: 75px;
   height: 75px;
 }
 
 #chessboard .black-tile {
   background-color: #779556;
-  border: 1px solid #000;
+  border: 0px
 }
 
 #chessboard .white-tile {
   background-color: #ebecd0;
-  border: 1px solid #000;
+  border: 0px
+}
+
+#chessboard .highlighted-black-tile {
+  background-color: #bccc4a;
+  border: 0px
+}
+
+#chessboard .highlighted-white-tile {
+  background-color: #f5f58a;
+  border: 0px
 }
