@@ -13,7 +13,7 @@ interface TileProps {
 
 function Tile({ colour, img, onClick, isHighlighted }: TileProps) {
     const baseClassName = `tile ${colour}-tile`;
-    const highlightedClassName = `tile highlighted-${colour}-tile`;
+    const highlightedClassName =`tile highlighted-${colour}-tile`;
 
     const tileClassName = isHighlighted ? highlightedClassName : baseClassName;
 
@@ -73,7 +73,14 @@ export default function Chessboard() {
     };
 
     const handleTileClick = (x: number, y: number) => {
-        setHighlightedTile({ x, y });
+        // Check if the clicked tile is already highlighted
+        if (highlightedTile && highlightedTile.x === x && highlightedTile.y === y) {
+            // If it is, unhighlight the tile by setting highlightedTile to null
+            setHighlightedTile(null);
+        } else {
+            // If it's not highlighted, set the clicked tile as highlighted
+            setHighlightedTile({ x, y });
+        }
     };
 
     const board: JSX.Element[] = [];
