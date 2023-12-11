@@ -12,17 +12,20 @@ interface TileProps {
 }
 
 function Tile({ colour, img, onClick, isHighlighted }: TileProps) {
-    const baseClassName = `tile ${colour}-tile`;
+    const baseTileClassName = `tile ${colour}-tile`;
+    const validTileClassName = `tile valid-${colour}-tile`;
     const highlightedClassName =`tile highlighted-${colour}-tile`;
-
-    const tileClassName = isHighlighted ? highlightedClassName : baseClassName;
+    const tileClassName = isHighlighted ? highlightedClassName : baseTileClassName;
 
     const handleClick = () => {
         onClick();
     };
 
     if (!img) {
-        return <div className={tileClassName}></div>;
+        return <div className={baseTileClassName}>
+            <button className={validTileClassName} onClick={handleClick}>
+            </button>
+        </div>;
     } else {
         return (
             <div>

@@ -34,3 +34,21 @@
   background-color: #f5f58a;
   border: 0px
 }
+
+#chessboard .valid-black-tile {
+  height: 25px;
+  width: 25px;
+  background-color: #6b8a4c;
+  border-radius: 50%;
+  border: 0px;
+  display: inline-block;
+}
+
+#chessboard .valid-white-tile {
+  height: 25px;
+  width: 25px;
+  background-color: #d1d5b7;
+  border-radius: 50%;
+  border: 0px;
+  display: inline-block;
+}
