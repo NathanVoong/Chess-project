@@ -52,3 +52,14 @@
   border: 0px;
   display: inline-block;
 }
+
+#chessboard .valid-tile-button {
+  width: 75px;
+  height: 75px;
+  background-color: Transparent;
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  display: inline-block;
+}
