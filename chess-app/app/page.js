@@ -1,6 +1,6 @@
 'use client'
 import "./App.css";
-import chessboard from './src/chessBoardComponent.tsx'
+import chessboard from './App.tsx'
 import { useEffect, useState } from "react";
 
 export default function App() {

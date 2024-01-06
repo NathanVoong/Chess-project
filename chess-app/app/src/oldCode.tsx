@@ -1,5 +1,17 @@
-import React, {useEffect, useState} from "react";
-import "../App.css";
+import Chessboard from "./Components/Chessboard/chessboard";
+
+function App() {
+    return (
+        <div id="app">
+            <Chessboard/>
+        </div>
+    )
+}
+
+export default App;
+
+import  React, {useEffect, useState} from "react";
+import "./chessBoardComponent.css";
 
 const verticalAxis = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -142,7 +154,7 @@ export default function Chessboard() {
             onClick={updatedBoard[currentTile].props.onClick}
             isHighlighted={highlightedTile && highlightedTile.x === reverseGridPosition(+updatedBoard[currentTile].key).x && highlightedTile.y === reverseGridPosition(+updatedBoard[currentTile].key).y}
         />
-
+        console.log("moved piece")
         setBoard(updatedBoard);
     }
 
@@ -162,9 +174,10 @@ export default function Chessboard() {
                 newBoard.push(...createEmptyRow(j));
             }
         }
-
+        console.log("board refreshed")
         setBoard(newBoard);
     }, [highlightedTile]);
+
     //movePiece(board, highlightedTile, 0, 20)
     return (
         <>

@@ -1,0 +1,20 @@
+#chessboard {
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(8, 75px);
+    grid-template-rows: repeat(8, 75px);
+    width: 600px;
+    height: 600px;
+    background-color: blue;
+}
+
+#chessboard .valid-tile-button {
+    width: 75px;
+    height: 75px;
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    display: inline-block;
+}
