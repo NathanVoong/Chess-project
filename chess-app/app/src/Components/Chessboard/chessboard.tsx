@@ -1,7 +1,8 @@
 import "./Chessboard.css";
 import Tile from "../Tile/tile";
-import {MouseEvent, useRef} from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import {act} from "react-dom/test-utils";
+import {set} from "yaml/dist/schema/yaml-1.1/set";
 
 const verticalAxis = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -12,44 +13,66 @@ interface Piece {
     y: number;
 }
 
-const pieces: Piece[] = [];
+const initialBoardState: Piece[] = [];
 
 for (let p = 0; p < 2; p++) {
     const type = (p === 0) ? "black" : "white";
     const y = (p === 0) ? 7 : 0;
 
-    pieces.push({image: `assets/images/${type}Rook.png`, x: 0, y: y })
-    pieces.push({image: `assets/images/${type}Knight.png`, x: 1, y: y })
-    pieces.push({image: `assets/images/${type}Bishop.png`, x: 2, y: y })
-    pieces.push({image: `assets/images/${type}Queen.png`, x: 3, y: y })
-    pieces.push({image: `assets/images/${type}King.png`, x: 4, y: y })
-    pieces.push({image: `assets/images/${type}Bishop.png`, x: 5, y: y })
-    pieces.push({image: `assets/images/${type}Knight.png`, x: 6, y: y })
-    pieces.push({image: `assets/images/${type}Rook.png`, x: 7, y: y })
+    initialBoardState.push({ image: `assets/images/${type}Rook.png`, x: 0, y });
+    initialBoardState.push({ image: `assets/images/${type}Rook.png`, x: 7, y });
+    initialBoardState.push({
+        image: `assets/images/${type}Knight.png`,
+        x: 1,
+        y,
+    });
+    initialBoardState.push({
+        image: `assets/images/${type}Knight.png`,
+        x: 6,
+        y,
+    });
+    initialBoardState.push({
+        image: `assets/images/${type}Bishop.png`,
+        x: 2,
+        y,
+    });
+    initialBoardState.push({
+        image: `assets/images/${type}Bishop.png`,
+        x: 5,
+        y,
+    });
+    initialBoardState.push({ image: `assets/images/${type}Queen.png`, x: 3, y });
+    initialBoardState.push({ image: `assets/images/${type}King.png`, x: 4, y });
 }
 
 for (let i = 0; i < 8; i++) {
-    pieces.push({image: "assets/images/blackPawn.png", x: i, y:6})
+    initialBoardState.push({ image: "assets/images/blackPawn.png", x: i, y: 6 });
 }
 
 for (let i = 0; i < 8; i++) {
-    pieces.push({image: "assets/images/whitePawn.png", x: i, y:1})
+    initialBoardState.push({ image: "assets/images/whitePawn.png", x: i, y: 1 });
 }
 
 export default function Chessboard () {
+    const[activePiece, setActivePiece] = useState<HTMLElement | null>(null);
+    const [gridX, setGridX] = useState(0);
+    const [gridY, setGridY] = useState(0);
+    const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
     const chessboardRef = useRef<HTMLElement>(null);
 
-    let activePiece: HTMLElement | null = null;
     function grabPiece(e: React.MouseEvent) {
         const element = e.target as HTMLElement
-        if (element.classList.contains("chess-piece")) {
+        const chessboard = chessboardRef.current;
+        if (element.classList.contains("chess-piece") && chessboard) {
+            setGridX(Math.floor((e.clientX - chessboard.offsetLeft) / 80));
+            setGridY(Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 640) / 80)));
             const x = e.clientX - 38;
             const y = e.clientY - 38;
             element.style.position = "absolute";
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
 
-            activePiece = element
+            setActivePiece(element);
         }
     }
 
@@ -87,8 +110,23 @@ export default function Chessboard () {
     }
 
     function dropPiece(e: React.MouseEvent) {
-        if (activePiece) {
-            activePiece = null;
+        const chessboard = chessboardRef.current;
+        if (activePiece && chessboard) {
+            const x = Math.floor((e.clientX - chessboard.offsetLeft) / 80);
+            const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 640) / 80));
+            console.log(x, y)
+            console.log(gridX, gridY)
+            setPieces((value) => {
+                const pieces = value.map((p) => {
+                    if (p.x === gridX && p.y === gridY) {
+                        p.x = x;
+                        p.y = y;
+                    }
+                    return p;
+                });
+                return pieces;
+            });
+            setActivePiece(null);
         }
     }
 
