@@ -1,6 +1,6 @@
 import "./Chessboard.css";
 import Tile from "../Tile/tile";
-import { useRef, useState } from "react";
+import {useRef, useState} from "react";
 import PieceLogic from "../../PieceLogic/pieceLogic";
 import {
     VERTICAL_AXIS,
@@ -14,9 +14,9 @@ import {
     samePosition,
 } from "../../Constants";
 
-export default function Chessboard () {
-    const[activePiece, setActivePiece] = useState<HTMLElement | null>(null);
-    const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
+export default function Chessboard() {
+    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
+    const [grabPosition, setGrabPosition] = useState<Position>({x: -1, y: -1});
     const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
     const chessboardRef = useRef<HTMLElement>(null);
     const pieceLogic = new PieceLogic();
@@ -27,7 +27,7 @@ export default function Chessboard () {
         if (element.classList.contains("chess-piece") && chessboard) {
             const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
             const grabY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 640) / GRID_SIZE));
-            setGrabPosition({ x: grabX, y: grabY });
+            setGrabPosition({x: grabX, y: grabY});
             const x = e.clientX - GRID_SIZE / 2;
             const y = e.clientY - GRID_SIZE / 2;
             element.style.position = "absolute";
@@ -51,21 +51,17 @@ export default function Chessboard () {
 
             if (x < minX) {
                 activePiece.style.left = `${minX}px`
-            }
-            else if (x > maxX) {
+            } else if (x > maxX) {
                 activePiece.style.left = `${maxX}px`
-            }
-            else {
+            } else {
                 activePiece.style.left = `${x}px`
             }
 
             if (y < minY) {
                 activePiece.style.top = `${minY}px`
-            }
-            else if (y > maxY) {
+            } else if (y > maxY) {
                 activePiece.style.top = `${maxY}px`
-            }
-            else {
+            } else {
                 activePiece.style.top = `${y}px`
             }
         }
@@ -81,7 +77,7 @@ export default function Chessboard () {
             if (currentPiece) {
                 const validMove = pieceLogic.isValidMove(
                     grabPosition,
-                    { x, y },
+                    {x, y},
                     currentPiece.type,
                     currentPiece.team,
                     pieces
@@ -89,7 +85,7 @@ export default function Chessboard () {
 
                 const isEnPassantMove = pieceLogic.isEnPassantMove(
                     grabPosition,
-                    { x, y },
+                    {x, y},
                     currentPiece.type,
                     currentPiece.team,
                     pieces
@@ -105,7 +101,7 @@ export default function Chessboard () {
                             piece.position.y = y;
                             results.push(piece);
                         } else if (
-                            !samePosition(piece.position, { x, y: y - pawnDirection })
+                            !samePosition(piece.position, {x, y: y - pawnDirection})
                         ) {
                             if (piece.type === PieceType.PAWN) {
                                 piece.enPassant = false;
@@ -130,7 +126,7 @@ export default function Chessboard () {
                             piece.position.x = x;
                             piece.position.y = y;
                             results.push(piece);
-                        } else if (!samePosition(piece.position, { x, y })) {
+                        } else if (!samePosition(piece.position, {x, y})) {
                             if (piece.type === PieceType.PAWN) {
                                 piece.enPassant = false;
                             }
@@ -158,11 +154,11 @@ export default function Chessboard () {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
             const number = j + i + 2;
             const piece = pieces.find((p) =>
-                samePosition(p.position, { x: i, y: j })
+                samePosition(p.position, {x: i, y: j})
             );
             let image = piece ? piece.image : undefined;
 
-            board.push(<Tile key={`${j},${i}`}image={image} number={number}/>)
+            board.push(<Tile key={`${j},${i}`} image={image} number={number}/>)
         }
     }
 
