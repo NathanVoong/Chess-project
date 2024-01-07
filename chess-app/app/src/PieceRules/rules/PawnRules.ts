@@ -1,5 +1,5 @@
-import { Piece, PieceType, Position, samePosition, TeamType } from "../../Constants";
-import { tileIsEmptyOrOccupiedByOpponent, tileIsOccupied, tileIsOccupiedByOpponent } from "./GeneralRules";
+import {Piece, PieceType, Position, samePosition, TeamType} from "../../Constants";
+import {tileIsEmptyOrOccupiedByOpponent, tileIsOccupied, tileIsOccupiedByOpponent} from "./GeneralRules";
 
 export const pawnMove = (initialPosition: Position, desiredPosition: Position, team: TeamType, boardState: Piece[]): boolean => {
     const specialRow = team === TeamType.OUR ? 1 : 6;
@@ -56,12 +56,12 @@ export const getPossiblePawnMoves = (pawn: Piece, boardState: Piece[]): Position
     const specialRow = pawn.team === TeamType.OUR ? 1 : 6;
     const pawnDirection = pawn.team === TeamType.OUR ? 1 : -1;
 
-    const normalMove: Position = { x: pawn.position.x, y: pawn.position.y + pawnDirection };
-    const specialMove: Position = { x: normalMove.x, y: normalMove.y + pawnDirection };
-    const upperLeftAttack: Position = { x: pawn.position.x - 1, y: pawn.position.y + pawnDirection };
-    const upperRightAttack: Position = { x: pawn.position.x + 1, y: pawn.position.y + pawnDirection };
-    const leftPosition: Position = { x: pawn.position.x - 1, y: pawn.position.y };
-    const rightPosition: Position = { x: pawn.position.x + 1, y: pawn.position.y };
+    const normalMove: Position = {x: pawn.position.x, y: pawn.position.y + pawnDirection};
+    const specialMove: Position = {x: normalMove.x, y: normalMove.y + pawnDirection};
+    const upperLeftAttack: Position = {x: pawn.position.x - 1, y: pawn.position.y + pawnDirection};
+    const upperRightAttack: Position = {x: pawn.position.x + 1, y: pawn.position.y + pawnDirection};
+    const leftPosition: Position = {x: pawn.position.x - 1, y: pawn.position.y};
+    const rightPosition: Position = {x: pawn.position.x + 1, y: pawn.position.y};
 
     if (!tileIsOccupied(normalMove, boardState)) {
         possibleMoves.push(normalMove);

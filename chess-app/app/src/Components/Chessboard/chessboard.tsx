@@ -1,38 +1,26 @@
 import "./Chessboard.css";
 import Tile from "../Tile/tile";
 import {useRef, useState} from "react";
-import PieceLogic from "../../PieceLogic/pieceLogic";
 import {
     VERTICAL_AXIS,
     HORIZONTAL_AXIS,
     GRID_SIZE,
     Piece,
-    PieceType,
-    TeamType,
-    initialBoardState,
     Position,
     samePosition,
 } from "../../Constants";
 
-export default function Chessboard() {
-    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
-    const [promotionPawn, setPromotionPawn] = useState<Piece>();
-    const [grabPosition, setGrabPosition] = useState<Position>({x: -1, y: -1});
-    const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
-    const chessboardRef = useRef<HTMLElement>(null);
-    const modalRef = useRef<HTMLDivElement>(null);
-    const pieceLogic = new PieceLogic();
+interface Props {
+    playMove: (piece: Piece, position: Position) => boolean;
+    pieces: Piece[];
+}
 
-    function updateValidMoves() {
-        setPieces((currentPieces) => {
-            return currentPieces.map(p => {
-                p.possibleMoves = pieceLogic.getValidMoves(p, currentPieces);
-                return p;
-            });
-        });
-    }
+export default function Chessboard({playMove, pieces}: Props) {
+    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
+    const [grabPosition, setGrabPosition] = useState<Position>({x: -1, y: -1});
+    const chessboardRef = useRef<HTMLElement>(null);
+
     function grabPiece(e: React.MouseEvent) {
-        updateValidMoves();
         const element = e.target as HTMLElement
         const chessboard = chessboardRef.current;
         if (element.classList.contains("chess-piece") && chessboard) {
@@ -86,76 +74,8 @@ export default function Chessboard() {
             const currentPiece = pieces.find((p) => samePosition(p.position, grabPosition));
 
             if (currentPiece) {
-                const validMove = pieceLogic.isValidMove(
-                    grabPosition,
-                    {x, y},
-                    currentPiece.type,
-                    currentPiece.team,
-                    pieces
-                );
-
-                const isEnPassantMove = pieceLogic.isEnPassantMove(
-                    grabPosition,
-                    {x, y},
-                    currentPiece.type,
-                    currentPiece.team,
-                    pieces
-                );
-
-                const pawnDirection = currentPiece.team === TeamType.OUR ? 1 : -1;
-
-                if (isEnPassantMove) {
-                    const updatedPieces = pieces.reduce((results, piece) => {
-                        if (samePosition(piece.position, grabPosition)) {
-                            piece.enPassant = false;
-                            piece.position.x = x;
-                            piece.position.y = y;
-                            results.push(piece);
-                        } else if (
-                            !samePosition(piece.position, {x, y: y - pawnDirection})
-                        ) {
-                            if (piece.type === PieceType.PAWN) {
-                                piece.enPassant = false;
-                            }
-                            results.push(piece);
-                        }
-
-                        return results;
-                    }, [] as Piece[]);
-
-                    setPieces(updatedPieces);
-                } else if (validMove) {
-                    //UPDATES THE PIECE POSITION
-                    //AND IF A PIECE IS ATTACKED, REMOVES IT
-                    const updatedPieces = pieces.reduce((results, piece) => {
-                        if (samePosition(piece.position, grabPosition)) {
-                            //SPECIAL MOVE
-                            piece.enPassant =
-                                Math.abs(grabPosition.y - y) === 2 &&
-                                piece.type === PieceType.PAWN;
-
-                            piece.position.x = x;
-                            piece.position.y = y;
-
-                            let promotionRow = (piece.team === TeamType.OUR) ? 7 : 0;
-
-                            if(y === promotionRow && piece.type === PieceType.PAWN) {
-                                modalRef.current?.classList.remove("hidden");
-                                setPromotionPawn(piece);
-                            }
-                            results.push(piece);
-                        } else if (!samePosition(piece.position, {x, y})) {
-                            if (piece.type === PieceType.PAWN) {
-                                piece.enPassant = false;
-                            }
-                            results.push(piece);
-                        }
-
-                        return results;
-                    }, [] as Piece[]);
-
-                    setPieces(updatedPieces);
-                } else {
+                var succes = playMove(currentPiece, {x, y});
+                if (!succes) {
                     //RESETS THE PIECE POSITION
                     activePiece.style.position = "relative";
                     activePiece.style.removeProperty("top");
@@ -164,49 +84,6 @@ export default function Chessboard() {
             }
             setActivePiece(null);
         }
-    }
-
-    function promotePawn(pieceType: PieceType) {
-        if(promotionPawn === undefined) {
-            return;
-        }
-
-        const updatedPieces = pieces.reduce((results, piece) => {
-            if(samePosition(piece.position, promotionPawn.position)) {
-                piece.type = pieceType;
-                const teamType = (piece.team === TeamType.OUR) ? "white" : "black";
-                let image = "";
-                switch(pieceType) {
-                    case PieceType.ROOK: {
-                        image = "Rook";
-                        break;
-                    }
-                    case PieceType.BISHOP: {
-                        image = "Bishop";
-                        break;
-                    }
-                    case PieceType.KNIGHT: {
-                        image = "Knight";
-                        break;
-                    }
-                    case PieceType.QUEEN: {
-                        image = "Queen";
-                        break;
-                    }
-                }
-                piece.image = `assets/images/${teamType}${image}.png`;
-            }
-            results.push(piece);
-            return results;
-        }, [] as Piece[])
-
-        setPieces(updatedPieces);
-
-        modalRef.current?.classList.add("hidden");
-    }
-
-    function promotionTeamType() {
-        return (promotionPawn?.team === TeamType.OUR) ? "white" : "black";
     }
 
     let board = [];
@@ -223,21 +100,13 @@ export default function Chessboard() {
             let highlight = currentPiece?.possibleMoves ?
                 currentPiece.possibleMoves.some(p => samePosition(p, {x: i, y: j})) : false;
 
-            board.push(<Tile key={`${j},${i}`} image={image} number={number} highlight={highlight} />);
+            board.push(<Tile key={`${j},${i}`} image={image} number={number} highlight={highlight}/>);
         }
     }
 
     // @ts-ignore
     return (
         <>
-            <div id="pawn-promotion-modal" className="hidden" ref={modalRef}>
-                <div className="modal-body">
-                    <img onClick={() => promotePawn(PieceType.ROOK)} src={`/assets/images/${promotionTeamType()}Rook.png`}/>
-                    <img onClick={() => promotePawn(PieceType.BISHOP)} src={`/assets/images/${promotionTeamType()}Bishop.png`}/>
-                    <img onClick={() => promotePawn(PieceType.KNIGHT)} src={`/assets/images/${promotionTeamType()}Knight.png`}/>
-                    <img onClick={() => promotePawn(PieceType.QUEEN)} src={`/assets/images/${promotionTeamType()}Queen.png`}/>
-                </div>
-            </div>
             <div
                 onMouseMove={(e) => movePiece(e)}
                 onMouseDown={(e) => grabPiece(e)}
