@@ -1,4 +1,5 @@
-import {Piece, Position, samePosition, TeamType} from "../../Constants";
+import { samePosition, TeamType } from "../../Constants";
+import { Piece, Position } from "../../models";
 import {tileIsEmptyOrOccupiedByOpponent, tileIsOccupied, tileIsOccupiedByOpponent} from "./GeneralRules";
 
 export const queenMove = (initialPosition: Position, desiredPosition: Position, team: TeamType, boardState: Piece[]): boolean => {
@@ -7,10 +8,7 @@ export const queenMove = (initialPosition: Position, desiredPosition: Position, 
         let multiplierX = (desiredPosition.x < initialPosition.x) ? -1 : (desiredPosition.x > initialPosition.x) ? 1 : 0;
         let multiplierY = (desiredPosition.y < initialPosition.y) ? -1 : (desiredPosition.y > initialPosition.y) ? 1 : 0;
 
-        let passedPosition: Position = {
-            x: initialPosition.x + (i * multiplierX),
-            y: initialPosition.y + (i * multiplierY)
-        };
+        let passedPosition = new Position(initialPosition.x + (i * multiplierX), initialPosition.y + (i * multiplierY));
 
         if (samePosition(passedPosition, desiredPosition)) {
             if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
@@ -30,7 +28,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Top movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x, y: queen.position.y + i};
+        const destination = new Position(queen.position.x, queen.position.y + i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -44,7 +42,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Bottom movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x, y: queen.position.y - i};
+        const destination = new Position(queen.position.x, queen.position.y - i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -58,7 +56,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Left movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x - i, y: queen.position.y};
+        const destination = new Position(queen.position.x - i, queen.position.y);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -72,7 +70,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Right movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x + i, y: queen.position.y};
+        const destination = new Position(queen.position.x + i, queen.position.y);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -86,7 +84,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Upper right movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x + i, y: queen.position.y + i};
+        const destination = new Position(queen.position.x + i, queen.position.y + i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -100,7 +98,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Bottom right movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x + i, y: queen.position.y - i};
+        const destination = new Position(queen.position.x + i, queen.position.y - i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -114,7 +112,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Bottom left movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x - i, y: queen.position.y - i};
+        const destination = new Position(queen.position.x - i, queen.position.y - i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
@@ -128,7 +126,7 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
     // Top left movement
     for (let i = 1; i < 8; i++) {
-        const destination: Position = {x: queen.position.x - i, y: queen.position.y + i};
+        const destination = new Position(queen.position.x - i, queen.position.y + i);
 
         if (!tileIsOccupied(destination, boardstate)) {
             possibleMoves.push(destination);
