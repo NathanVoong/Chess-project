@@ -154,6 +154,6 @@ export const initialBoard: Board = new Board([
         new Position(7, 1),
         TeamType.OUR,
         false),
-], 1);
+], 0);
 
 initialBoard.calculateAllMoves();

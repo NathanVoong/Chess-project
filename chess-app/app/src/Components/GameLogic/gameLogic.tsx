@@ -19,21 +19,29 @@ import {
 } from "../../PieceRules/rules";
 import {PieceType, TeamType} from "../../Types";
 import Chessboard from "../Chessboard/chessboard";
+import Menu from "../Menu/menu";
 
-export default function PieceLogic() {
+export default function GameLogic() {
     const [board, setBoard] = useState<Board>(initialBoard.clone());
     const [promotionPawn, setPromotionPawn] = useState<Piece>();
+    const [showMenu, setShowMenu] = useState(true)
+    const [playerColour, setPlayerColour] = useState(null)
     const modalRef = useRef<HTMLDivElement>(null);
     const checkmateModalRef = useRef<HTMLDivElement>(null);
+    const backButton = () => {
+        setShowMenu(!showMenu);
+        setPlayerColour(null)
+        setBoard(initialBoard.clone());
+    };
 
     function playMove(playedPiece: Piece, destination: Position): boolean {
         // If the playing piece doesn't have any moves return
         if (playedPiece.possibleMoves === undefined) return false;
 
         // Prevent the inactive team from playing
-        if (playedPiece.team === TeamType.OUR
-            && board.totalTurns % 2 !== 1) return false;
         if (playedPiece.team === TeamType.OPPONENT
+            && board.totalTurns % 2 !== 1) return false;
+        if (playedPiece.team === TeamType.OUR
             && board.totalTurns % 2 !== 0) return false;
 
         let playedMoveIsValid = false;
@@ -168,30 +176,53 @@ export default function PieceLogic() {
         setBoard(initialBoard.clone());
     }
 
-    return (
-        <>
-            <p style={{color: "white", fontSize: "24px", textAlign: "center"}}>Total turns: {board.totalTurns}</p>
-            <div className="modal hidden" ref={modalRef}>
+    if (showMenu) {
+        return (
+            <Menu toggleMenu={() => setShowMenu(!showMenu)}/>
+        )
+    } else if (!showMenu && playerColour === null) {
+        return (
+            <div className="modal" ref={modalRef}>
                 <div className="modal-body">
-                    <img onClick={() => promotePawn(PieceType.ROOK)}
-                         src={`/assets/images/${promotionTeamType()}Rook.png`}/>
-                    <img onClick={() => promotePawn(PieceType.BISHOP)}
-                         src={`/assets/images/${promotionTeamType()}Bishop.png`}/>
-                    <img onClick={() => promotePawn(PieceType.KNIGHT)}
-                         src={`/assets/images/${promotionTeamType()}Knight.png`}/>
-                    <img onClick={() => promotePawn(PieceType.QUEEN)}
-                         src={`/assets/images/${promotionTeamType()}Queen.png`}/>
+                    <img onClick={() => setPlayerColour("white")}
+                         src={'/assets/images/whitePawn.png'}/>
+                    <img onClick={() => setPlayerColour("black")}
+                         src={'/assets/images/blackPawn.png'}/>
                 </div>
             </div>
-            <div className="modal hidden" ref={checkmateModalRef}>
-                <div className="modal-body">
-                    <div className="checkmate-body">
-                        <span>The winning team is {board.winningTeam === TeamType.OUR ? "white" : "black"}!</span>
-                        <button onClick={restartGame}>Play again</button>
+        )
+    }
+    else {
+        return (
+            <>
+                <button className="backButton" onClick={backButton}>Back</button>
+                <p style={{
+                    color: "Black",
+                    fontSize: "24px",
+                    textAlign: "center"
+                }}>Move: {Math.round(board.totalTurns / 2)}</p>
+                <div className="modal hidden" ref={modalRef}>
+                    <div className="modal-body">
+                        <img onClick={() => promotePawn(PieceType.ROOK)}
+                             src={`/assets/images/${promotionTeamType()}Rook.png`}/>
+                        <img onClick={() => promotePawn(PieceType.BISHOP)}
+                             src={`/assets/images/${promotionTeamType()}Bishop.png`}/>
+                        <img onClick={() => promotePawn(PieceType.KNIGHT)}
+                             src={`/assets/images/${promotionTeamType()}Knight.png`}/>
+                        <img onClick={() => promotePawn(PieceType.QUEEN)}
+                             src={`/assets/images/${promotionTeamType()}Queen.png`}/>
                     </div>
                 </div>
-            </div>
-            <Chessboard playMove={playMove} pieces={board.pieces}/>
-        </>
-    )
+                <div className="modal hidden" ref={checkmateModalRef}>
+                    <div className="modal-body">
+                        <div className="checkmate-body">
+                            <span>The winning team is {board.winningTeam === TeamType.OUR ? "white" : "black"}!</span>
+                            <button onClick={restartGame}>Play again</button>
+                        </div>
+                    </div>
+                </div>
+                <Chessboard playMove={playMove} pieces={board.pieces}/>
+            </>
+        )
+    }
 }

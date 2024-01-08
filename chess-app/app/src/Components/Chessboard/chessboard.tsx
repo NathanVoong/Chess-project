@@ -17,6 +17,7 @@ export default function Chessboard({playMove, pieces}: Props) {
     const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
     const [grabPosition, setGrabPosition] = useState<Position>(new Position(-1, -1));
     const chessboardRef = useRef<HTMLElement>(null);
+    const [showMenu, setShowMenu] = useState(false);
 
     function grabPiece(e: React.MouseEvent) {
         const element = e.target as HTMLElement

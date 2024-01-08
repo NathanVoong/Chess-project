@@ -23,7 +23,7 @@ export class Board {
     }
 
     get currentTeam(): TeamType {
-        return this.totalTurns % 2 === 0 ? TeamType.OPPONENT : TeamType.OUR;
+        return this.totalTurns % 2 === 0 ? TeamType.OUR : TeamType.OPPONENT;
     }
 
     calculateAllMoves() {
@@ -41,14 +41,14 @@ export class Board {
         // Check if the current team moves are valid
         this.checkCurrentTeamMoves();
 
-        // Remove the posibble moves for the team that is not playing
+        // Remove the possible moves for the team that is not playing
         for (const piece of
             this.pieces.filter(p => p.team !== this.currentTeam)) {
             piece.possibleMoves = [];
         }
 
         // Check if the playing team still has moves left
-        // Otherwise, checkmate!
+        // Otherwise, checkmate
         if (this.pieces.filter(p => p.team === this.currentTeam)
             .some(p => p.possibleMoves !== undefined && p.possibleMoves.length > 0)) return;
 

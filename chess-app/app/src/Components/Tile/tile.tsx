@@ -8,6 +8,7 @@ interface Props {
 
 export default function Tile({number, image, highlight}: Props) {
     const className: string = ["tile",
+        //flip here
         number % 2 === 0 && "black-tile",
         number % 2 !== 0 && "white-tile",
         highlight && "tile-highlight",
