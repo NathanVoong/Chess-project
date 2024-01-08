@@ -26,22 +26,24 @@ export default function PieceLogic() {
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        updatePossibleMoves();
+        board.calculateAllMoves();
     }, []);
 
-    function updatePossibleMoves() {
-        board.calculateAllMoves();
-    }
-
     function playMove(playedPiece: Piece, destination: Position): boolean {
+        // If the playing piece doesn't have any moves return
+        if (playedPiece.possibleMoves === undefined) return false;
+
+        // Prevent the inactive team from playing
+        if (playedPiece.team === TeamType.OUR
+            && board.totalTurns % 2 !== 1) return false;
+        if (playedPiece.team === TeamType.OPPONENT
+            && board.totalTurns % 2 !== 0) return false;
+
         let playedMoveIsValid = false;
 
-        const validMove = isValidMove(
-            playedPiece.position,
-            destination,
-            playedPiece.type,
-            playedPiece.team
-        );
+        const validMove = playedPiece.possibleMoves?.some(m => m.samePosition(destination));
+
+        if (!validMove) return false;
 
         const enPassantMove = isEnPassantMove(
             playedPiece.position,
@@ -53,19 +55,25 @@ export default function PieceLogic() {
         // playMove modifies the board thus we
         // need to call setBoard
         setBoard((previousBoard) => {
+            const clonedBoard = board.clone();
+            clonedBoard.totalTurns += 1;
             // Playing the move
-            playedMoveIsValid = board.playMove(enPassantMove,
+            playedMoveIsValid = clonedBoard.playMove(enPassantMove,
                 validMove, playedPiece,
                 destination);
 
-            return board.clone();
+            return clonedBoard;
         })
 
         // This is for promoting a pawn
         let promotionRow = (playedPiece.team === TeamType.OUR) ? 7 : 0;
         if (destination.y === promotionRow && playedPiece.isPawn) {
             modalRef.current?.classList.remove("hidden");
-            setPromotionPawn(playedPiece);
+            setPromotionPawn((previousPromotionPawn) => {
+                const clonedPlayedPiece = playedPiece.clone();
+                clonedPlayedPiece.position = destination.clone();
+                return clonedPlayedPiece;
+            });
         }
         return playedMoveIsValid;
     }
@@ -137,35 +145,21 @@ export default function PieceLogic() {
             return;
         }
 
-        board.pieces = board.pieces.reduce((results, piece) => {
-            if (piece.samePiecePosition(promotionPawn)) {
-                piece.type = pieceType;
-                const teamType = (piece.team === TeamType.OUR) ? "white" : "black";
-                let image = "";
-                switch (pieceType) {
-                    case PieceType.ROOK: {
-                        image = "Rook";
-                        break;
-                    }
-                    case PieceType.BISHOP: {
-                        image = "Bishop";
-                        break;
-                    }
-                    case PieceType.KNIGHT: {
-                        image = "Knight";
-                        break;
-                    }
-                    case PieceType.QUEEN: {
-                        image = "Queen";
-                        break;
-                    }
+        setBoard((previousBoard) => {
+            const clonedBoard = board.clone();
+            clonedBoard.pieces = clonedBoard.pieces.reduce((results, piece) => {
+                if (piece.samePiecePosition(promotionPawn)) {
+                    results.push(new Piece(piece.position.clone(), pieceType,
+                        piece.team));
+                } else {
+                    results.push(piece);
                 }
-                piece.image = `assets/images/${teamType}${image}.png`;
-            }
-            results.push(piece);
-            return results;
-        }, [] as Piece[])
-        updatePossibleMoves();
+                return results;
+            }, [] as Piece[]);
+            clonedBoard.calculateAllMoves();
+
+            return clonedBoard;
+        })
 
         modalRef.current?.classList.add("hidden");
     }
@@ -176,6 +170,7 @@ export default function PieceLogic() {
 
     return (
         <>
+            <p style={{color: "white", fontSize: "24px"}}>{board.totalTurns}</p>
             <div id="pawn-promotion-modal" className="hidden" ref={modalRef}>
                 <div className="modal-body">
                     <img onClick={() => promotePawn(PieceType.ROOK)}
