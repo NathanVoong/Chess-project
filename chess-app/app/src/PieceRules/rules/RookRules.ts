@@ -1,5 +1,5 @@
-import { TeamType } from "../../Types";
-import { Piece, Position } from "../../models";
+import {TeamType} from "../../Types";
+import {Piece, Position} from "../../models";
 import {tileIsEmptyOrOccupiedByOpponent, tileIsOccupied, tileIsOccupiedByOpponent} from "./GeneralRules";
 
 export const rookMove = (initialPosition: Position, desiredPosition: Position, team: TeamType, boardState: Piece[]): boolean => {
@@ -8,7 +8,7 @@ export const rookMove = (initialPosition: Position, desiredPosition: Position, t
             let multiplier = (desiredPosition.y < initialPosition.y) ? -1 : 1;
 
             let passedPosition = new Position(initialPosition.x, initialPosition.y + (i * multiplier));
-            if(passedPosition.samePosition(desiredPosition)) {
+            if (passedPosition.samePosition(desiredPosition)) {
                 if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
                     return true;
                 }
@@ -25,7 +25,7 @@ export const rookMove = (initialPosition: Position, desiredPosition: Position, t
             let multiplier = (desiredPosition.x < initialPosition.x) ? -1 : 1;
 
             let passedPosition = new Position(initialPosition.x + (i * multiplier), initialPosition.y);
-            if(passedPosition.samePosition(desiredPosition)) {
+            if (passedPosition.samePosition(desiredPosition)) {
                 if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
                     return true;
                 }
@@ -44,6 +44,8 @@ export const getPossibleRookMoves = (rook: Piece, boardstate: Piece[]): Position
 
     // Top movement
     for (let i = 1; i < 8; i++) {
+        // Stop checking if move is outside of the board
+        if (rook.position.y + i > 7) break;
         const destination = new Position(rook.position.x, rook.position.y + i);
 
         if (!tileIsOccupied(destination, boardstate)) {
@@ -58,6 +60,8 @@ export const getPossibleRookMoves = (rook: Piece, boardstate: Piece[]): Position
 
     // Bottom movement
     for (let i = 1; i < 8; i++) {
+        // Stop checking if move is outside of the board
+        if (rook.position.y - i < 0) break;
         const destination = new Position(rook.position.x, rook.position.y - i);
 
         if (!tileIsOccupied(destination, boardstate)) {
@@ -72,6 +76,8 @@ export const getPossibleRookMoves = (rook: Piece, boardstate: Piece[]): Position
 
     // Left movement
     for (let i = 1; i < 8; i++) {
+        // Stop checking if move is outside of the board
+        if (rook.position.x - i < 0) break;
         const destination = new Position(rook.position.x - i, rook.position.y);
 
         if (!tileIsOccupied(destination, boardstate)) {
@@ -86,6 +92,8 @@ export const getPossibleRookMoves = (rook: Piece, boardstate: Piece[]): Position
 
     // Right movement
     for (let i = 1; i < 8; i++) {
+        // Stop checking if move is outside of the board
+        if (rook.position.x + i > 7) break;
         const destination = new Position(rook.position.x + i, rook.position.y);
 
         if (!tileIsOccupied(destination, boardstate)) {

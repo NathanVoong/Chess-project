@@ -15,6 +15,7 @@ import {Position} from "./Position";
 export class Board {
     pieces: Piece[];
     totalTurns: number;
+    winningTeam?: TeamType;
 
     constructor(pieces: Piece[], totalTurns: number) {
         this.pieces = pieces;
@@ -45,6 +46,13 @@ export class Board {
             this.pieces.filter(p => p.team !== this.currentTeam)) {
             piece.possibleMoves = [];
         }
+
+        // Check if the playing team still has moves left
+        // Otherwise, checkmate!
+        if (this.pieces.filter(p => p.team === this.currentTeam)
+            .some(p => p.possibleMoves !== undefined && p.possibleMoves.length > 0)) return;
+
+        this.winningTeam = (this.currentTeam === TeamType.OUR) ? TeamType.OPPONENT : TeamType.OUR;
     }
 
     checkCurrentTeamMoves() {
@@ -109,9 +117,26 @@ export class Board {
              playedPiece: Piece,
              destination: Position): boolean {
         const pawnDirection = playedPiece.team === TeamType.OUR ? 1 : -1;
+        const destinationPiece = this.pieces.find(p => p.samePosition(destination));
 
         // castling logic
+        if (playedPiece.isKing && destinationPiece?.isRook
+            && destinationPiece.team === playedPiece.team) {
+            const direction = (destinationPiece.position.x - playedPiece.position.x > 0) ? 1 : -1;
+            const newKingXPosition = playedPiece.position.x + direction * 2;
+            this.pieces = this.pieces.map(p => {
+                if (p.samePiecePosition(playedPiece)) {
+                    p.position.x = newKingXPosition;
+                } else if (p.samePiecePosition(destinationPiece)) {
+                    p.position.x = newKingXPosition - direction;
+                }
 
+                return p;
+            });
+
+            this.calculateAllMoves();
+            return true;
+        }
 
         if (enPassantMove) {
             this.pieces = this.pieces.reduce((results, piece) => {
