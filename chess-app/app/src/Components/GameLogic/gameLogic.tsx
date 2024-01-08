@@ -25,12 +25,10 @@ export default function GameLogic() {
     const [board, setBoard] = useState<Board>(initialBoard.clone());
     const [promotionPawn, setPromotionPawn] = useState<Piece>();
     const [showMenu, setShowMenu] = useState(true)
-    const [playerColour, setPlayerColour] = useState(null)
     const modalRef = useRef<HTMLDivElement>(null);
     const checkmateModalRef = useRef<HTMLDivElement>(null);
     const backButton = () => {
         setShowMenu(!showMenu);
-        setPlayerColour(null)
         setBoard(initialBoard.clone());
     };
 
@@ -179,17 +177,6 @@ export default function GameLogic() {
     if (showMenu) {
         return (
             <Menu toggleMenu={() => setShowMenu(!showMenu)}/>
-        )
-    } else if (!showMenu && playerColour === null) {
-        return (
-            <div className="modal" ref={modalRef}>
-                <div className="modal-body">
-                    <img onClick={() => setPlayerColour("white")}
-                         src={'/assets/images/whitePawn.png'}/>
-                    <img onClick={() => setPlayerColour("black")}
-                         src={'/assets/images/blackPawn.png'}/>
-                </div>
-            </div>
         )
     }
     else {
