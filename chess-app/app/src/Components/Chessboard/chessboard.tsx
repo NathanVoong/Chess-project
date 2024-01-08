@@ -6,7 +6,7 @@ import {
     HORIZONTAL_AXIS,
     GRID_SIZE,
 } from "../../Constants";
-import { Piece, Position } from "../../models";
+import {Piece, Position} from "../../models";
 
 interface Props {
     playMove: (piece: Piece, position: Position) => boolean;
@@ -110,6 +110,7 @@ export default function Chessboard({playMove, pieces}: Props) {
                 onMouseDown={(e) => grabPiece(e)}
                 onMouseUp={(e) => dropPiece(e)}
                 id="chessboard"
+                // @ts-ignore
                 ref={chessboardRef}
             >
                 {board}
